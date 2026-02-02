@@ -37,11 +37,11 @@
 </head>
 <body>
 
-<audio id="bgm" loop preload="auto"><source src="audio/bgm.mp3" type="audio/mpeg"></audio>
-<audio id="chandaVoice" preload="auto"><source src="audio/chanda_de.mp3" type="audio/mpeg"></audio>
-<audio id="hashi" preload="auto"><source src="audio/hashi.mp3" type="audio/mpeg"></audio>
-<audio id="planVoice" preload="auto"><source src="audio/plan_dialogue.mp3" type="audio/mpeg"></audio>
-<audio id="tarekVoice" preload="auto"><source src="audio/tarek_voice.mp3" type="audio/mpeg"></audio>
+<audio id="bgm" loop preload="auto"><source src="bgm.mp3" type="audio/mpeg"></audio>
+<audio id="chandaVoice" preload="auto"><source src="chanda_de.mp3" type="audio/mpeg"></audio>
+<audio id="hashi" preload="auto"><source src="hashi.mp3" type="audio/mpeg"></audio>
+<audio id="planVoice" preload="auto"><source src="plan_dialogue.mp3" type="audio/mpeg"></audio>
+<audio id="tarekVoice" preload="auto"><source src="tarek_voice.mp3" type="audio/mpeg"></audio>
 
 <div id="ui-layer">
     <div id="instruction" class="instruction-box">নেতার সাথে দেখা করতে ৫০০০ টাকা চান্দা তুলুন</div>
@@ -89,7 +89,8 @@ function forcePlayAudio(id) {
     const audio = document.getElementById(id);
     if (audio) {
         audio.currentTime = 0;
-        audio.play().catch(e => console.log("Audio play blocked"));
+        // লোকাল ফাইল ব্যবহারের জন্য play promise হ্যান্ডেল করা হয়েছে
+        audio.play().catch(e => console.warn("Audio play blocked: ব্রাউজারের সিকিউরিটির জন্য প্রথমে ইউজার ক্লিক প্রয়োজন।", e));
     }
 }
 
