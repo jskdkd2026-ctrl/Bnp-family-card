@@ -6,35 +6,22 @@
     <title>BNP Mission 2026</title>
     <style>
         :root { --primary: #2e7d32; --danger: #ff1744; --gold: #ffd700; --bg: #0d0d0d; }
-        body { 
-            margin: 0; 
-            padding: 0;
-            overflow: hidden; 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: var(--bg); 
-            touch-action: manipulation;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        canvas { 
-            display: block; 
-            background: linear-gradient(180deg, #0f2027, #2c5364);
-            max-width: 100%;
-            max-height: 100%;
-        }
+        body { margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); touch-action: manipulation; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { display: block; background: linear-gradient(180deg, #0f2027, #2c5364); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
         
-        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; padding: 15px; display: flex; flex-direction: column; align-items: center; z-index: 10; pointer-events: none; }
+        #ui-layer { position: absolute; top: 0; width: 100%; padding: 15px; display: flex; flex-direction: column; align-items: center; z-index: 10; pointer-events: none; }
         .instruction-box { background: rgba(0,0,0,0.85); color: #fff; padding: 10px 20px; border-radius: 30px; border: 2px solid var(--gold); font-size: 16px; font-weight: bold; margin-bottom: 5px; text-align: center; min-width: 250px; }
         .stat-box { background: rgba(0,0,0,0.85); color: var(--gold); padding: 8px 25px; border-radius: 12px; border: 2px solid var(--gold); font-size: 24px; font-weight: 900; }
         
-        #startScreen, #gameOverScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: white; text-align: center; }
+        #startScreen, #gameOverScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
+        .btn-main { background: linear-gradient(45deg, #1b5e20, #388e3c); color: white; padding: 15px 45px; font-size: 20px; border: none; border-radius: 50px; cursor: pointer; font-weight: 900; margin-top: 20px; }
         
-        .btn-main { background: linear-gradient(45deg, #1b5e20, #388e3c); color: white; padding: 15px 40px; font-size: 20px; border: none; border-radius: 50px; cursor: pointer; font-weight: 900; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        
+        .msg-box { padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 8px solid; text-align: left; background: rgba(255,255,255,0.1); width: 100%; max-width: 400px; }
+        .kormi-msg { border-color: var(--primary); }
+        .jonogon-msg { border-color: var(--danger); }
+
         #controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; z-index: 20; }
-        .jump-btn { width: 80px; height: 80px; background: rgba(255,255,255,0.1); border: 3px solid white; border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 18px; backdrop-filter: blur(5px); pointer-events: auto; cursor: pointer; }
+        .jump-btn { width: 90px; height: 90px; background: rgba(255,255,255,0.1); border: 3px solid white; border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center; font-weight: 900; backdrop-filter: blur(5px); cursor: pointer; }
     </style>
 </head>
 <body>
@@ -51,12 +38,20 @@
 </div>
 
 <div id="startScreen">
-    <h1 style="font-size: 40px; color: var(--gold); margin: 0;">WE HAVE A PLAN</h1>
+    <h1 style="font-size: 45px; color: var(--gold); margin-bottom: 10px;">WE HAVE A PLAN</h1>
     <button class="btn-main" onclick="startGame()">START MISSION</button>
 </div>
 
 <div id="gameOverScreen" style="display: none;">
     <h1 style="color:var(--danger); font-size: 40px; margin:0;">ধোলাই শুরু!</h1>
+    <div class="msg-box kormi-msg">
+        <b style="color:var(--gold);">BNP KORMI:</b><br>
+        <span>"তারেক জিয়ার We Have A Plan বাস্তবায়ন করতেছি আমরা, আমাকে মারবেন না! 😭🙏"</span>
+    </div>
+    <div class="msg-box jonogon-msg">
+        <b style="color:var(--gold);">JONOGON:</b><br>
+        <span>"চান্দা পুটকি দিয়ে ভরে দেওয়া হলো! 🖕😡🤬"</span>
+    </div>
     <button class="btn-main" onclick="resetGame()">TRY AGAIN</button>
 </div>
 
@@ -68,18 +63,17 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const instructionEl = document.getElementById('instruction');
+const bgm = document.getElementById('bgm');
 
-// Screen Adjustment for Mobile & PC
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
+function resize() {
+    canvas.width = window.innerWidth > 600 ? 600 : window.innerWidth;
     canvas.height = window.innerHeight;
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+window.addEventListener('resize', resize);
+resize();
 
 let audioCtx;
-const bgm = document.getElementById('bgm');
-bgm.volume = 0.2; // Background sound kom kora hoyeche
+bgm.volume = 0.2;
 
 function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -88,15 +82,14 @@ function initAudio() {
 
 function playSound(id) {
     const el = document.getElementById(id);
-    if (el) {
-        el.currentTime = 0;
-        el.play().catch(e => console.log("Sound error"));
-    }
+    if (el) { el.currentTime = 0; el.play().catch(e => {}); }
 }
 
-let score = 0, gameActive = false, frame = 0, gameSpeed = 6;
-let tarekActive = false, tarekX = -400;
+const baseSpeed = 5;
+let score = 0, gameSpeed = baseSpeed, gameActive = false, frame = 0;
+let tarekActive = false, tarekX = -300, cardDropped = false, droppedCard = null;
 const groundHeight = 100;
+
 const player = { x: 50, y: 0, w: 50, h: 80, dy: 0, jumpPower: -18, gravity: 0.8, grounded: false };
 let obstacles = [];
 
@@ -106,33 +99,34 @@ function startGame() {
     document.getElementById('gameOverScreen').style.display = 'none';
     gameActive = true;
     bgm.currentTime = 0;
-    bgm.play();
+    bgm.play(); // Sound Start
     requestAnimationFrame(loop);
 }
 
 function resetGame() {
-    // Game reset logic
-    score = 0;
-    scoreEl.innerText = "0";
-    obstacles = [];
-    frame = 0;
-    tarekActive = false;
-    player.y = 0;
-    player.dy = 0;
+    score = 0; gameSpeed = baseSpeed; frame = 0;
+    scoreEl.innerText = "0"; obstacles = [];
+    tarekActive = false; tarekX = -300; cardDropped = false; droppedCard = null;
+    player.y = 0; player.dy = 0;
     instructionEl.innerText = "নেতার সাথে দেখা করতে ৫০০০ টাকা চান্দা তুলুন";
+    
+    // Background sound reset logic
+    bgm.pause();
+    bgm.currentTime = 0;
+    
     startGame();
 }
 
 function spawn() {
     if (tarekActive) return;
-    const isEnemy = Math.random() < 0.3;
+    const isEnemy = Math.random() < 0.35;
     obstacles.push({
         x: canvas.width,
-        y: canvas.height - groundHeight - 70,
+        y: canvas.height - groundHeight - 65,
         w: 60, h: 60,
         isEnemy: isEnemy,
         speed: gameSpeed,
-        icon: isEnemy ? "👮" : "🚲"
+        icon: isEnemy ? "👮‍♂️" : "🚲"
     });
 }
 
@@ -149,18 +143,43 @@ function update() {
     }
 
     if (score >= 5000 && !tarekActive) {
-        tarekActive = true;
+        tarekActive = true; tarekX = -200; cardDropped = false;
+        instructionEl.innerText = "টাকা দে হাতে ফ্যামিলি কার্ড নে সাথে";
         playSound('tarekVoice');
+    }
+
+    if (tarekActive) {
+        tarekX += 2;
+        if (tarekX > canvas.width - 150 && !cardDropped) {
+            droppedCard = { x: tarekX, y: canvas.height - groundHeight - 80, w: 80, h: 50 };
+            cardDropped = true;
+        }
+        if (tarekX > canvas.width + 100) {
+            tarekActive = false;
+            instructionEl.innerText = "৫০০০ টাকা তুলে আবার কার্ড নিন";
+        }
+    }
+
+    if (droppedCard) {
+        droppedCard.x -= 2;
+        if (player.x < droppedCard.x + droppedCard.w && player.x + player.w > droppedCard.x &&
+            player.y < droppedCard.y + droppedCard.h && player.y + player.h > droppedCard.y) {
+            score += 1000;
+            scoreEl.innerText = score;
+            gameSpeed += 0.8; 
+            playSound('hashi');
+            droppedCard = null;
+        }
     }
 
     obstacles.forEach((obs, i) => {
         obs.x -= obs.speed;
-        // Collision Detection
         if (player.x < obs.x + obs.w && player.x + player.w > obs.x &&
             player.y < obs.y + obs.h && player.y + player.h > obs.y) {
             if (obs.isEnemy) {
                 gameActive = false;
-                bgm.pause(); // Background sound off
+                bgm.pause(); // Stop BGM immediately on Game Over
+                bgm.currentTime = 0;
                 playSound('planVoice');
                 document.getElementById('gameOverScreen').style.display = 'flex';
             } else {
@@ -176,17 +195,31 @@ function update() {
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Ground
     ctx.fillStyle = '#222';
     ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
     
-    // Player (Center Adjustment)
+    // Player
     ctx.fillStyle = '#1b5e20';
     ctx.fillRect(player.x, player.y, player.w, player.h);
-    ctx.fillStyle = "white";
-    ctx.font = "30px Arial";
-    ctx.fillText("🌾", player.x + 10, player.y + 50);
+    ctx.font = "40px Arial";
+    ctx.fillText("🌾", player.x + 5, player.y + 55);
+
+    // Tarek Zia
+    if (tarekActive) {
+        ctx.fillText("🕶️", tarekX, canvas.height - groundHeight - 40);
+        ctx.fillStyle = "yellow";
+        ctx.font = "bold 14px Arial";
+        ctx.fillText("LEADER", tarekX, canvas.height - groundHeight - 90);
+    }
+
+    // Family Card
+    if (droppedCard) {
+        ctx.fillStyle = "gold";
+        ctx.fillRect(droppedCard.x, droppedCard.y, droppedCard.w, droppedCard.h);
+        ctx.fillStyle = "black";
+        ctx.font = "bold 12px Arial";
+        ctx.fillText("CARD", droppedCard.x + 15, droppedCard.y + 30);
+    }
 
     // Obstacles
     obstacles.forEach(obs => {
@@ -200,7 +233,7 @@ function loop() {
     update();
     draw();
     frame++;
-    if (frame % 100 === 0) spawn();
+    if (frame % Math.max(60, 120 - Math.floor(gameSpeed * 5)) === 0) spawn();
     requestAnimationFrame(loop);
 }
 
@@ -212,11 +245,9 @@ function jump() {
     } 
 }
 
-// Controls logic
 document.getElementById('jumpBtn').addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
 document.getElementById('jumpBtn').addEventListener('mousedown', (e) => { jump(); });
 window.addEventListener('keydown', (e) => { if(e.code === 'Space') jump(); });
-
 </script>
 </body>
 </html>
